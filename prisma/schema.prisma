@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoVehiculo {
+  SEDAN
+  SUV
+  PICKUP
+  COUPE
+  HATCHBACK
+}
+
+enum EstadoVehiculo {
+  DISPONIBLE
+  RESERVADO
+  EN_ALQUILER
+}
+
+enum EstadoReserva {
+  CONFIRMADA
+  CANCELADA
+  FINALIZADA
+}
+
+model Vehiculo {
+  id           Int            @id @default(autoincrement())
+  patente      String         @unique
+  marca        String
+  modelo       String
+  anio         Int
+  color        String?
+  tipo         TipoVehiculo
+  precioDiario Float
+  estado       EstadoVehiculo @default(DISPONIBLE)
+  activo       Boolean        @default(true)
+  reservas     Reserva[]
+}
+
+model Cliente {
+  id              Int       @id @default(autoincrement())
+  documento       String    @unique
+  nombre          String
+  apellido        String
+  email           String    @unique
+  telefono        String?
+  fechaNacimiento DateTime?
+  activo          Boolean   @default(true)
+  reservas        Reserva[]
+}
+
+model Reserva {
+  id              Int           @id @default(autoincrement())
+  clienteId       Int
+  vehiculoId      Int
+  fechaInicio     DateTime
+  fechaFin        DateTime
+  importeTotal    Float
+  estado          EstadoReserva @default(CONFIRMADA)
+  cliente         Cliente       @relation(fields: [clienteId], references: [id])
+  vehiculo        Vehiculo      @relation(fields: [vehiculoId], references: [id])
+}
