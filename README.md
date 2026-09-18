@@ -18,27 +18,27 @@ Antes de comenzar, asegurate de tener instalado en tu equipo:
 Sigue estos pasos para levantar el entorno de desarrollo backend en tu computadora:
 
 ### 1. Clonar el repositorio e instalar dependencias
-git clone <LINK_DEL_REPOSITORIO>
-cd rentar-backend
-npm install
+* git clone <LINK_DEL_REPOSITORIO>
+* cd rentar-backend
+* npm install
 
 ### 2. Configurar las variables de entorno
-Crea un archivo llamado .env en la raíz del proyecto con la siguiente estructura:
-PORT=5000
-DATABASE_URL="mysql://usuario:contraseña@localhost:3306/rentar_db"
+* Crea un archivo llamado .env en la raíz del proyecto con la siguiente estructura:
+* PORT=5000
+* DATABASE_URL="mysql://usuario:contraseña@localhost:3306/rentar_db"
 
 > Nota: Reemplaza usuario y contraseña por tus credenciales locales de MySQL.
 
 ### 3. Crear la base de datos en MySQL
-Abre tu cliente de MySQL (Workbench, DBeaver, PHPMyAdmin, etc.) y ejecuta:
-CREATE DATABASE rentar_db;
+* Abre tu cliente de MySQL (Workbench, DBeaver, PHPMyAdmin, etc.) y ejecuta:
+* CREATE DATABASE rentar_db;
 
 ### 4. Sincronizar Prisma con la base de datos
-Ejecuta el siguiente comando para generar las tablas y relaciones automáticas en MySQL:
-npx prisma db push
+* Ejecuta el siguiente comando para generar las tablas y relaciones automáticas en MySQL:
+* npx prisma db push
 
 ### 5. Iniciar el servidor
-npm run dev
+* npm run dev
 
 Si todo se configuró correctamente, verás en la consola:
 * 🚀 Servidor base: http://localhost:5000
@@ -48,11 +48,11 @@ Si todo se configuró correctamente, verás en la consola:
 
 ## 📁 Arquitectura del Proyecto Backend (src/)
 
-src/
-├── config/        # Configuraciones generales (Swagger, DB, etc.)
-├── controllers/   # Lógica de negocio e interacción con Prisma ORM
-├── routes/        # Definición de endpoints REST y anotaciones OpenAPI
-└── index.js       # Punto de entrada y servidor Express
+* src/
+* ├── config/        # Configuraciones generales (Swagger, DB, etc.)
+* ├── controllers/   # Lógica de negocio e interacción con Prisma ORM
+* ├── routes/        # Definición de endpoints REST y anotaciones OpenAPI
+* └── index.js       # Punto de entrada y servidor Express
 
 ---
 
@@ -85,12 +85,12 @@ src/
 El desarrollo del Frontend se realiza mediante una aplicación independiente en React que consumirá la API Backend[cite: 1].
 
 ### 1. Inicialización del proyecto Frontend
-En una carpeta independiente a este repositorio (o dentro de una subcarpeta frontend/), inicializa el proyecto:
-npm create vite@latest rentar-frontend -- --template react
-cd rentar-frontend
-npm install
-npm install axios react-router-dom
-npm run dev
+* En una carpeta independiente a este repositorio (o dentro de una subcarpeta frontend/), inicializa el proyecto:
+* npm create vite@latest rentar-frontend -- --template react
+* cd rentar-frontend
+* npm install
+* npm install axios react-router-dom
+* npm run dev
 
 ### 2. Conexión con el Backend
 * Base URL de la API REST: http://localhost:5000/api
