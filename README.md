@@ -82,7 +82,7 @@ Si todo se configuró correctamente, verás en la consola:
 
 ## ⚛️ Guía para el Integrante 5 — Frontend (React + Vite)
 
-El desarrollo del Frontend se realiza mediante una aplicación independiente en React que consumirá la API Backend[cite: 1].
+El desarrollo del Frontend se realiza mediante una aplicación independiente en React que consumirá la API Backend.
 
 ### 1. Inicialización del proyecto Frontend
 * En una carpeta independiente a este repositorio (o dentro de una subcarpeta frontend/), inicializa el proyecto:
