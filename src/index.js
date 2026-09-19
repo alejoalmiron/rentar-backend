@@ -5,6 +5,9 @@ import swaggerUi from 'swagger-ui-express';
 import { PrismaClient } from '@prisma/client';
 import { swaggerSpec } from './config/swagger.js';
 
+import reservaRoutes from './routes/reserva.routes.js';
+
+
 dotenv.config();
 
 const app = express();
@@ -16,6 +19,8 @@ app.use(express.json());
 
 // Documentación Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use("/api/reservas", reservaRoutes);
 
 // Ruta base de prueba
 app.get('/', (req, res) => {
