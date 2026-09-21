@@ -7,6 +7,9 @@ import { swaggerSpec } from './config/swagger.js';
 import vehiculoRoutes from './routes/vehiculo.routes.js';
 import clienteRoutes from './routes/cliente.routes.js';
 
+import reservaRoutes from './routes/reserva.routes.js';
+
+
 dotenv.config();
 
 const app = express();
@@ -18,6 +21,8 @@ app.use(express.json());
 
 // Documentación Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use("/api/reservas", reservaRoutes);
 
 // Ruta base de prueba
 app.get('/', (req, res) => {
