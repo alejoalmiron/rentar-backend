@@ -7,7 +7,7 @@ export const getClientes = async (req, res) => {
     const clientes = await prisma.cliente.findMany({
       where: { activo: true }
     });
-    res.json(clientes);
+    res.json(clientes.map((cliente) => ({ ...cliente, dni: cliente.documento })));
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener los clientes', detalle: error.message });
   }
@@ -19,7 +19,7 @@ export const getClienteById = async (req, res) => {
       where: { id: Number(req.params.id), activo: true }
     });
     if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
-    res.json(cliente);
+    res.json({ ...cliente, dni: cliente.documento });
   } catch (error) {
     res.status(500).json({ error: 'Error al buscar el cliente', detalle: error.message });
   }
@@ -27,11 +27,11 @@ export const getClienteById = async (req, res) => {
 
 export const createCliente = async (req, res) => {
   try {
-    const { documento, nombre, apellido, email, telefono, fechaNacimiento } = req.body;
+    const { documento, dni, nombre, apellido, email, telefono, fechaNacimiento } = req.body;
 
     const nuevoCliente = await prisma.cliente.create({
       data: {
-        documento,
+        documento: documento || dni,
         nombre,
         apellido,
         email,
@@ -39,7 +39,7 @@ export const createCliente = async (req, res) => {
         fechaNacimiento: fechaNacimiento ? new Date(fechaNacimiento) : null
       }
     });
-    res.status(201).json(nuevoCliente);
+    res.status(201).json({ ...nuevoCliente, dni: nuevoCliente.documento });
   } catch (error) {
     res.status(500).json({ error: 'Error al registrar el cliente', detalle: error.message });
   }

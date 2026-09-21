@@ -8,7 +8,7 @@ export const crearReserva = async (req, res) => {
     let continuar = true;
 
     try{
-        const{ clienteId, vehiculoId, fechaInicio, fechaFin } = req.body;
+        const { clienteId, vehiculoId, clienteDni, vehiculoPatente, fechaInicio, fechaFin } = req.body;
 
         const inicio = new Date(fechaInicio);
         const fin = new Date(fechaFin);
@@ -29,7 +29,9 @@ export const crearReserva = async (req, res) => {
         let cliente;
 
         if(continuar){
-            cliente = await prisma.cliente.findUnique({where: { id: Number(clienteId) }});
+            cliente = clienteDni
+                ? await prisma.cliente.findUnique({ where: { documento: clienteDni } })
+                : await prisma.cliente.findUnique({ where: { id: Number(clienteId) } });
             
             if(!cliente || !cliente.activo){
                 statusCodigo = 400;
@@ -42,7 +44,9 @@ export const crearReserva = async (req, res) => {
         let vehiculo;
         
         if(continuar){
-                vehiculo = await prisma.vehiculo.findUnique({where: { id: Number(vehiculoId) }});
+                vehiculo = vehiculoPatente
+                    ? await prisma.vehiculo.findUnique({ where: { patente: vehiculoPatente } })
+                    : await prisma.vehiculo.findUnique({ where: { id: Number(vehiculoId) } });
                 
                 if(!vehiculo || !vehiculo.activo){
                     statusCodigo = 400;
@@ -55,7 +59,7 @@ export const crearReserva = async (req, res) => {
         if(continuar){
             const conflicto = await prisma.reserva.findFirst({
                 where: {
-                    vehiculoId: Number(vehiculoId),
+                    vehiculoId: vehiculo.id,
                     estado: "CONFIRMADA",
                     OR: [{ fechaInicio: { lte: fin }, fechaFin: { gte: inicio } }]
                 }
@@ -75,8 +79,8 @@ export const crearReserva = async (req, res) => {
             statusCodigo = 201;
             respuestaReserva = await prisma.reserva.create({
                 data: {
-                    clienteId: Number(clienteId),
-                    vehiculoId: Number(vehiculoId),
+                    clienteId: cliente.id,
+                    vehiculoId: vehiculo.id,
                     fechaInicio: inicio,
                     fechaFin: fin,
                     importeTotal,

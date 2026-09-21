@@ -1,6 +1,4 @@
-import { gql } from 'apollo-server-express';
-
-export const typeDefs = gql`
+export const typeDefs = `
   enum TipoVehiculo {
     SEDAN
     SUV
@@ -28,15 +26,46 @@ export const typeDefs = gql`
     activo: Boolean!
   }
 
+  type Cliente {
+    id: ID!
+    dni: String!
+    nombre: String!
+    apellido: String!
+    email: String!
+    telefono: String
+  }
+
+  type Reserva {
+    id: ID!
+    fechaInicio: String!
+    fechaFin: String!
+    estado: EstadoReserva!
+    montoTotal: Float!
+    cliente: Cliente!
+    vehiculo: Vehiculo!
+  }
+
+  enum EstadoReserva {
+    CONFIRMADA
+    CANCELADA
+    FINALIZADA
+  }
+
   type Query {
-    consultarDisponibilidad(
-      tipo: TipoVehiculo
+    vehiculosDisponibles(
+      tipo: String
       marca: String
       modelo: String
       precioMin: Float
       precioMax: Float
       fechaInicio: String!
       fechaFin: String!
-    ): [Vehiculo]
+    ): [Vehiculo!]!
+    reservasPorCliente(dni: String!): [Reserva!]!
+    historialReservas(estado: String, patente: String): [Reserva!]!
+  }
+
+  type Mutation {
+    cancelarReserva(id: ID!): Reserva!
   }
 `;

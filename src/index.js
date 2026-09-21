@@ -11,7 +11,8 @@ import reservaRoutes from './routes/reserva.routes.js';
 
 
 // GraphQL
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express5';
 import { typeDefs } from './graphql/schema.js';
 import { resolvers } from './graphql/resolvers.js';
 
@@ -42,7 +43,7 @@ async function startServer() {
   });
   
   await server.start();
-  server.applyMiddleware({ app, path: '/graphql' });
+  app.use('/graphql', express.json(), expressMiddleware(server));
 
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {

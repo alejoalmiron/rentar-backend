@@ -2,7 +2,7 @@ import { prisma } from '../index.js';
 
 export const resolvers = {
   Query: {
-    consultarDisponibilidad: async (_, { tipo, marca, modelo, precioMin, precioMax, fechaInicio, fechaFin }) => {
+    vehiculosDisponibles: async (_, { tipo, marca, modelo, precioMin, precioMax, fechaInicio, fechaFin }) => {
       try {
         const inicio = new Date(fechaInicio);
         const fin = new Date(fechaFin);
@@ -43,5 +43,40 @@ export const resolvers = {
         throw new Error('Error al consultar disponibilidad: ' + error.message);
       }
     },
+    reservasPorCliente: (_, { dni }) => prisma.reserva.findMany({
+      where: { cliente: { documento: dni } },
+      include: { cliente: true, vehiculo: true },
+      orderBy: { fechaInicio: 'desc' },
+    }),
+    historialReservas: (_, { estado, patente }) => prisma.reserva.findMany({
+      where: {
+        ...(estado && { estado }),
+        ...(patente && { vehiculo: { patente } }),
+      },
+      include: { cliente: true, vehiculo: true },
+      orderBy: { fechaInicio: 'desc' },
+    }),
+  },
+  Mutation: {
+    cancelarReserva: async (_, { id }) => {
+      const reserva = await prisma.reserva.findUnique({ where: { id: Number(id) } });
+      if (!reserva) throw new Error('Reserva no encontrada');
+      if (reserva.estado === 'CANCELADA') throw new Error('La reserva ya está cancelada');
+      if (new Date() >= new Date(reserva.fechaInicio)) {
+        throw new Error('No se puede cancelar una reserva que ya comenzó');
+      }
+
+      return prisma.reserva.update({
+        where: { id: Number(id) },
+        data: { estado: 'CANCELADA' },
+        include: { cliente: true, vehiculo: true },
+      });
+    },
+  },
+  Cliente: {
+    dni: (cliente) => cliente.documento,
+  },
+  Reserva: {
+    montoTotal: (reserva) => reserva.importeTotal,
   },
 };

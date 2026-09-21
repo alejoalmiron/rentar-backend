@@ -97,6 +97,59 @@ export default function DisponibilidadPagina() {
   return (
     <Card title="Consultar Disponibilidad de Vehículos">
       <form onSubmit={handleBuscar}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '15px',
+            marginBottom: '20px',
+          }}
+        >
+          <CampoTexto
+            label="Fecha de inicio *"
+            type="date"
+            value={fechaInicio}
+            onChange={(e) => setFechaInicio(e.target.value)}
+            required
+          />
+          <CampoTexto
+            label="Fecha de fin *"
+            type="date"
+            value={fechaFin}
+            onChange={(e) => setFechaFin(e.target.value)}
+            required
+          />
+          <CampoTexto
+            label="Tipo"
+            placeholder="Ej: SUV"
+            value={tipo}
+            onChange={(e) => setTipo(e.target.value.toUpperCase())}
+          />
+          <CampoTexto
+            label="Marca"
+            placeholder="Ej: Toyota"
+            value={marca}
+            onChange={(e) => setMarca(e.target.value)}
+          />
+          <CampoTexto
+            label="Modelo"
+            placeholder="Ej: Corolla"
+            value={modelo}
+            onChange={(e) => setModelo(e.target.value)}
+          />
+          <CampoTexto
+            label="Precio mínimo"
+            type="number"
+            value={precioMin}
+            onChange={(e) => setPrecioMin(e.target.value)}
+          />
+          <CampoTexto
+            label="Precio máximo"
+            type="number"
+            value={precioMax}
+            onChange={(e) => setPrecioMax(e.target.value)}
+          />
+        </div>
         <Boton type="submit" disabled={cargando}>
           {cargando ? 'Buscando...' : 'Buscar Disponibles'}
         </Boton>
