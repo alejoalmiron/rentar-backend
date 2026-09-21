@@ -37,6 +37,29 @@ export const createCliente = async (req, res) => {
       });
     }
 
+    const clienteExistente = await prisma.cliente.findUnique({
+      where: { documento: documentoCliente },
+    });
+
+    if (clienteExistente?.activo) {
+      return res.status(409).json({ error: 'Ya existe un cliente activo con ese DNI.' });
+    }
+
+    if (clienteExistente) {
+      const clienteReactivado = await prisma.cliente.update({
+        where: { id: clienteExistente.id },
+        data: {
+          nombre,
+          apellido,
+          email,
+          telefono,
+          fechaNacimiento: fechaNacimiento ? new Date(fechaNacimiento) : null,
+          activo: true,
+        },
+      });
+      return res.status(200).json({ ...clienteReactivado, dni: clienteReactivado.documento });
+    }
+
     const nuevoCliente = await prisma.cliente.create({
       data: {
         documento: documentoCliente,

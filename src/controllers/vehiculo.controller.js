@@ -35,6 +35,31 @@ export const createVehiculo = async (req, res) => {
         campos: ['patente', 'marca', 'modelo', 'anio', 'tipo', 'precioDiario'],
       });
     }
+
+    const vehiculoExistente = await prisma.vehiculo.findUnique({
+      where: { patente },
+    });
+
+    if (vehiculoExistente?.activo) {
+      return res.status(409).json({ error: 'Ya existe un vehículo activo con esa patente.' });
+    }
+
+    if (vehiculoExistente) {
+      const vehiculoReactivado = await prisma.vehiculo.update({
+        where: { id: vehiculoExistente.id },
+        data: {
+          marca,
+          modelo,
+          anio: Number(anio),
+          color,
+          tipo,
+          precioDiario: parseFloat(precioDiario),
+          estado: estado || 'DISPONIBLE',
+          activo: true,
+        },
+      });
+      return res.status(200).json(vehiculoReactivado);
+    }
     
     const nuevoVehiculo = await prisma.vehiculo.create({
       data: {
