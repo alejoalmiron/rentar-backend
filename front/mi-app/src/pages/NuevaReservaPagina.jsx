@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '../components/Card';
 import CampoTexto from '../components/CampoTexto';
 import Boton from '../components/Boton';
@@ -28,7 +28,7 @@ export default function NuevaReservaPagina() {
         
         setVehiculos(Array.isArray(listaVehiculos) ? listaVehiculos : []);
         setClientes(Array.isArray(listaClientes) ? listaClientes : []);
-      } catch (error) {
+      } catch {
         alert('Error al cargar datos de clientes y vehículos desde el servidor.');
       } finally {
         setCargando(false);
@@ -63,7 +63,7 @@ export default function NuevaReservaPagina() {
       setVehiculoPatente('');
       setFechaInicio('');
       setFechaFin('');
-    } catch (error) {
+    } catch {
       alert('Error al procesar la reserva. Verificá si las fechas o la disponibilidad son válidas.');
     } finally {
       setEnviando(false);

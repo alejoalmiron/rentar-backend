@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Card from '../components/Card';
 import CampoTexto from '../components/CampoTexto';
 import Boton from '../components/Boton';
@@ -77,7 +77,7 @@ export default function DisponibilidadPagina() {
       } else {
         setResultados([]);
       }
-    } catch (error) {
+    } catch {
       alert('Error al conectar con el servidor GraphQL');
     } finally {
       setCargando(false);

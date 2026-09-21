@@ -17,7 +17,6 @@ export default function Boton({ children, onClick, type = "button", variante = "
         borderRadius: '6px',
         border: 'none',
         fontWeight: '600',
-        cursor: 'pointer',
         fontSize: '14px',
         ...estiloSeleccionado,
         opacity: disabled ? 0.65 : 1,

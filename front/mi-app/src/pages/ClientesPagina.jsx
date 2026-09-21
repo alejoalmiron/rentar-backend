@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Card from '../components/Card';
 import CampoTexto from '../components/CampoTexto';
 import Boton from '../components/Boton';
@@ -17,21 +17,21 @@ export default function ClientesPagina() {
   const [email, setEmail] = useState('');
   const [telefono, setTelefono] = useState('');
 
-  useEffect(() => {
-    cargarListaClientes();
-  }, []);
-
-  const cargarListaClientes = async () => {
+  const cargarListaClientes = useCallback(async () => {
     try {
       setCargando(true);
       const data = await getClientes();
       setClientes(Array.isArray(data) ? data : []);
-    } catch (error) {
+    } catch {
       alert('Error al obtener la lista de clientes desde el servidor.');
     } finally {
       setCargando(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    Promise.resolve().then(cargarListaClientes);
+  }, [cargarListaClientes]);
 
   const handleAgregarCliente = async (e) => {
     e.preventDefault();
@@ -62,7 +62,7 @@ export default function ClientesPagina() {
       setTelefono('');
 
       await cargarListaClientes();
-    } catch (error) {
+    } catch {
       alert('Error al registrar el cliente. Verificá que el DNI o Email no estén duplicados.');
     } finally {
       setEnviando(false);

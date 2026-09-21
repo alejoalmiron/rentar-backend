@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "prisma skills sync || exit 0",
+    "check": "node --check src/index.js && node --check src/graphql/schema.js && node --check src/graphql/resolvers.js && npx prisma validate",
+    "test": "npm run check",
+    "postinstall": "prisma generate",
     "dev": "nodemon src/index.js"
   },
   "repository": {

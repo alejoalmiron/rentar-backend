@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Card from '../components/Card';
 import CampoTexto from '../components/CampoTexto';
 import Boton from '../components/Boton';
@@ -55,7 +55,7 @@ export default function ReservasPagina() {
       } else {
         setReservas([]);
       }
-    } catch (error) {
+    } catch {
       alert('Error al buscar las reservas del cliente.');
     } finally {
       setCargando(false);
@@ -75,7 +75,7 @@ export default function ReservasPagina() {
           prev.map((r) => (r.id === idReserva ? { ...r, estado: 'CANCELADA' } : r))
         );
       }
-    } catch (error) {
+    } catch {
       alert('Error al intentar cancelar la reserva.');
     }
   };

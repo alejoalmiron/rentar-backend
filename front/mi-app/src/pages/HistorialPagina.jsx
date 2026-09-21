@@ -1,10 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Card from '../components/Card';
 import CampoTexto from '../components/CampoTexto';
 import Boton from '../components/Boton';
 import Tabla from '../components/Tabla';
 
 import { consultarGraphQL } from '../service/ConectarAlBackend';
+
+const QUERY_HISTORIAL = `
+  query ObtenerHistorialReservas($estado: String, $patente: String) {
+    historialReservas(estado: $estado, patente: $patente) {
+      id
+      fechaInicio
+      fechaFin
+      estado
+      montoTotal
+      cliente {
+        dni
+        nombre
+        apellido
+      }
+      vehiculo {
+        patente
+        marca
+        modelo
+      }
+    }
+  }
+`;
 
 export default function HistorialPagina() {
   const [historial, setHistorial] = useState([]);
@@ -13,33 +35,7 @@ export default function HistorialPagina() {
   const [estadoFiltro, setEstadoFiltro] = useState('');
   const [patenteFiltro, setPatenteFiltro] = useState('');
 
-  const QUERY_HISTORIAL = `
-    query ObtenerHistorialReservas($estado: String, $patente: String) {
-      historialReservas(estado: $estado, patente: $patente) {
-        id
-        fechaInicio
-        fechaFin
-        estado
-        montoTotal
-        cliente {
-          dni
-          nombre
-          apellido
-        }
-        vehiculo {
-          patente
-          marca
-          modelo
-        }
-      }
-    }
-  `;
-
-  useEffect(() => {
-    cargarHistorial();
-  }, []);
-
-  const cargarHistorial = async () => {
+  const cargarHistorial = useCallback(async () => {
     setCargando(true);
 
     try {
@@ -55,12 +51,16 @@ export default function HistorialPagina() {
       } else {
         setHistorial([]);
       }
-    } catch (error) {
+    } catch {
       alert('Error al cargar el historial de reservas desde el servidor.');
     } finally {
       setCargando(false);
     }
-  };
+  }, [estadoFiltro, patenteFiltro]);
+
+  useEffect(() => {
+    Promise.resolve().then(cargarHistorial);
+  }, [cargarHistorial]);
 
   const handleFiltrar = (e) => {
     e.preventDefault();

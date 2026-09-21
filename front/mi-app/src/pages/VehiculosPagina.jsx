@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Card from '../components/Card';
 import CampoTexto from '../components/CampoTexto';
 import Boton from '../components/Boton';
@@ -19,21 +19,21 @@ export default function VehiculosPagina() {
   const [tipo, setTipo] = useState('SEDAN');
   const [precioDiario, setPrecioDiario] = useState('');
 
-  useEffect(() => {
-    cargarListaVehiculos();
-  }, []);
-
-  const cargarListaVehiculos = async () => {
+  const cargarListaVehiculos = useCallback(async () => {
     try {
       setCargando(true);
       const data = await getVehiculos();
       setVehiculos(Array.isArray(data) ? data : []);
-    } catch (error) {
+    } catch {
       alert('Error al obtener la lista de vehículos desde el servidor.');
     } finally {
       setCargando(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    Promise.resolve().then(cargarListaVehiculos);
+  }, [cargarListaVehiculos]);
 
   const handleAgregarVehiculo = async (e) => {
     e.preventDefault();
@@ -68,7 +68,7 @@ export default function VehiculosPagina() {
       setPrecioDiario('');
 
       await cargarListaVehiculos();
-    } catch (error) {
+    } catch {
       alert('Error al registrar el vehículo. Verificá que la patente no esté duplicada.');
     } finally {
       setEnviando(false);
