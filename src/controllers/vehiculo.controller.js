@@ -27,7 +27,14 @@ export const getVehiculoById = async (req, res) => {
 
 export const createVehiculo = async (req, res) => {
   try {
-    const { patente, marca, modelo, anio, color, tipo, precioDiario, estado } = req.body;
+    const { patente, marca, modelo, anio, color, tipo, precioDiario, estado } = req.body || {};
+
+    if (!patente || !marca || !modelo || !anio || !tipo || precioDiario === undefined) {
+      return res.status(400).json({
+        error: 'Faltan datos obligatorios',
+        campos: ['patente', 'marca', 'modelo', 'anio', 'tipo', 'precioDiario'],
+      });
+    }
     
     const nuevoVehiculo = await prisma.vehiculo.create({
       data: {

@@ -27,11 +27,19 @@ export const getClienteById = async (req, res) => {
 
 export const createCliente = async (req, res) => {
   try {
-    const { documento, dni, nombre, apellido, email, telefono, fechaNacimiento } = req.body;
+    const { documento, dni, nombre, apellido, email, telefono, fechaNacimiento } = req.body || {};
+    const documentoCliente = documento || dni;
+
+    if (!documentoCliente || !nombre || !apellido || !email) {
+      return res.status(400).json({
+        error: 'Faltan datos obligatorios',
+        campos: ['dni', 'nombre', 'apellido', 'email'],
+      });
+    }
 
     const nuevoCliente = await prisma.cliente.create({
       data: {
-        documento: documento || dni,
+        documento: documentoCliente,
         nombre,
         apellido,
         email,

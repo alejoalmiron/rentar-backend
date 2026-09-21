@@ -23,6 +23,7 @@ export const prisma = new PrismaClient();
 
 
 app.use(cors({ origin: '*' }));
+app.use(express.json());
 
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
