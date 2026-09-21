@@ -1,4 +1,4 @@
-export default function Boton({ children, onClick, type = "button", variante = "primario" }) {
+export default function Boton({ children, onClick, type = "button", variante = "primario", disabled = false }) {
   const estilosVariantes = {
     primario: { backgroundColor: '#2563eb', color: '#ffffff' },  // Azul
     secundario: { backgroundColor: '#6b7280', color: '#ffffff' },// Gris
@@ -11,6 +11,7 @@ export default function Boton({ children, onClick, type = "button", variante = "
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       style={{
         padding: '10px 18px',
         borderRadius: '6px',
@@ -18,7 +19,9 @@ export default function Boton({ children, onClick, type = "button", variante = "
         fontWeight: '600',
         cursor: 'pointer',
         fontSize: '14px',
-        ...estiloSeleccionado // Se aplica el color correspondiente
+        ...estiloSeleccionado,
+        opacity: disabled ? 0.65 : 1,
+        cursor: disabled ? 'not-allowed' : 'pointer'
       }}
     >
       {children}

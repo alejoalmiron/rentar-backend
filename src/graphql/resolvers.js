@@ -14,8 +14,12 @@ export const resolvers = {
             ...(tipo && { tipo }),
             ...(marca && { marca: { contains: marca } }),
             ...(modelo && { modelo: { contains: modelo } }),
-            ...(precioMin !== undefined && { precioDiario: { gte: precioMin } }),
-            ...(precioMax !== undefined && { precioDiario: { lte: precioMax } }),
+            ...(precioMin !== undefined || precioMax !== undefined) && {
+              precioDiario: {
+                ...(precioMin !== undefined && { gte: precioMin }),
+                ...(precioMax !== undefined && { lte: precioMax }),
+              },
+            },
           },
         });
 
