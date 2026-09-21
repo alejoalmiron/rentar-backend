@@ -89,12 +89,16 @@ export default function NuevaReservaPagina() {
                   borderRadius: '6px',
                   border: '1px solid #d1d5db',
                   fontSize: '14px',
-                  backgroundColor: '#ffffff'
+                  backgroundColor: '#ffffff',
+                  color: '#1f2937',
+                  colorScheme: 'light'
                 }}
               >
-                <option value="">Seleccionar Cliente</option>
+                <option value="" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>
+                  Seleccionar Cliente
+                </option>
                 {clientes.map((c) => (
-                  <option key={c.dni} value={c.dni}>
+                  <option key={c.dni} value={c.dni} style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>
                     {c.apellido}, {c.nombre} (DNI: {c.dni})
                   </option>
                 ))}
@@ -112,12 +116,16 @@ export default function NuevaReservaPagina() {
                   borderRadius: '6px',
                   border: '1px solid #d1d5db',
                   fontSize: '14px',
-                  backgroundColor: '#ffffff'
+                  backgroundColor: '#ffffff',
+                  color: '#1f2937',
+                  colorScheme: 'light'
                 }}
               >
-                <option value="">Seleccionar Vehículo</option>
+                <option value="" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>
+                  Seleccionar Vehículo
+                </option>
                 {vehiculos.map((v) => (
-                  <option key={v.patente} value={v.patente}>
+                  <option key={v.patente} value={v.patente} style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>
                     {v.marca} {v.modelo} - [{v.patente}]
                   </option>
                 ))}

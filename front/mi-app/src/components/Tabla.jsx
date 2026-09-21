@@ -27,7 +27,7 @@ export default function Tabla({ columnas = [], datos = [], renderFila }) {
           <tr style={{ backgroundColor: '#f3f4f6', borderBottom: '1px solid #e5e7eb' }}>
             {columnas.map((col, index) => (
               <th key={index} style={{ padding: '12px 16px', fontWeight: '600', color: '#374151' }}>
-                {col}
+                {typeof col === 'string' ? col : col.header}
               </th>
             ))}
           </tr>
@@ -38,7 +38,19 @@ export default function Tabla({ columnas = [], datos = [], renderFila }) {
               key={item.id || index} 
               style={{ borderBottom: '1px solid #f3f4f6' }}
             >
-              {renderFila(item)}
+              {renderFila
+                ? renderFila(item)
+                : columnas.map((col, columnIndex) => {
+                    const valor = typeof col.accessor === 'function'
+                      ? col.accessor(item)
+                      : item[col.accessor];
+
+                    return (
+                      <td key={columnIndex} style={{ padding: '12px 16px' }}>
+                        {valor ?? '-'}
+                      </td>
+                    );
+                  })}
             </tr>
           ))}
         </tbody>

@@ -6,10 +6,10 @@ export default function Navegacion() {
 
   const enlaces = [
     { path: '/', label: 'Disponibilidad' },
-    { path: '/vehiculos', label: 'Vehículos (ABM)' },
-    { path: '/clientes', label: 'Clientes (ABM)' },
-    { path: '/nueva-reserva', label: 'Nueva Reserva' },
-    { path: '/reservas', label: 'Mis Reservas' },
+    { path: '/admin/vehiculos', label: 'Vehículos (ABM)' },
+    { path: '/admin/clientes', label: 'Clientes (ABM)' },
+    { path: '/reservar', label: 'Nueva Reserva' },
+    { path: '/mis-reservas', label: 'Mis Reservas' },
     { path: '/historial', label: 'Historial' },
   ];
 

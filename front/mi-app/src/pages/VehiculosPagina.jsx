@@ -134,13 +134,15 @@ export default function VehiculosPagina() {
                   borderRadius: '6px',
                   border: '1px solid #d1d5db',
                   fontSize: '14px',
-                  backgroundColor: '#ffffff'
+                  backgroundColor: '#ffffff',
+                  color: '#1f2937',
+                  colorScheme: 'light'
                 }}
               >
-                <option value="SEDAN">SEDAN</option>
-                <option value="HATCHBACK">HATCHBACK</option>
-                <option value="SUV">SUV</option>
-                <option value="PICKUP">PICKUP</option>
+                <option value="SEDAN" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>SEDAN</option>
+                <option value="HATCHBACK" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>HATCHBACK</option>
+                <option value="SUV" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>SUV</option>
+                <option value="PICKUP" style={{ color: '#1f2937', backgroundColor: '#ffffff' }}>PICKUP</option>
               </select>
             </div>
 
