@@ -1,86 +1,73 @@
-import { prisma } from '../index.js';
+import { customerClient } from '../grpc/customer.client.js';
+import { rentalClient } from '../grpc/rental.client.js';
+import { toGraphqlError } from '../grpc/httpErrors.js';
+import { vehicleClient } from '../grpc/vehicle.client.js';
+
+async function hydrateReservation(reservation) {
+  const customerId = reservation.customerId ?? reservation.clienteId;
+  const vehicleId = reservation.vehicleId ?? reservation.vehiculoId;
+  const [cliente, vehiculo] = await Promise.all([
+    reservation.cliente || customerId === undefined
+      ? reservation.cliente
+      : customerClient.getById(customerId),
+    reservation.vehiculo || vehicleId === undefined
+      ? reservation.vehiculo
+      : vehicleClient.getById(vehicleId),
+  ]);
+
+  return { ...reservation, cliente, vehiculo };
+}
+
+async function resolverGraphql(operation) {
+  try {
+    return await operation();
+  } catch (error) {
+    throw toGraphqlError(error);
+  }
+}
 
 export const resolvers = {
   Query: {
-    vehiculosDisponibles: async (_, { tipo, marca, modelo, precioMin, precioMax, fechaInicio, fechaFin }) => {
-      try {
-        const inicio = new Date(fechaInicio);
-        const fin = new Date(fechaFin);
+    vehiculosDisponibles: (_, filters) => resolverGraphql(async () => {
+      const { fechaInicio, fechaFin, ...vehicleFilters } = filters;
+      const vehicles = await vehicleClient.list(vehicleFilters);
+      const checks = await Promise.all(vehicles.map(async (vehicle) => {
+        const [operational, reservationAvailability] = await Promise.all([
+          vehicleClient.checkOperational({ id: vehicle.id, patente: vehicle.patente }),
+          rentalClient.checkAvailability({ vehiculoId: vehicle.id, fechaInicio, fechaFin }),
+        ]);
 
-        const vehiculos = await prisma.vehiculo.findMany({
-          where: {
-            activo: true,
-            estado: 'DISPONIBLE',
-            ...(tipo && { tipo }),
-            ...(marca && { marca: { contains: marca } }),
-            ...(modelo && { modelo: { contains: modelo } }),
-            ...(precioMin !== undefined || precioMax !== undefined) && {
-              precioDiario: {
-                ...(precioMin !== undefined && { gte: precioMin }),
-                ...(precioMax !== undefined && { lte: precioMax }),
-              },
-            },
-          },
-        });
+        const isOperational = operational.operational !== false
+          && operational.active !== false
+          && vehicle.activo !== false;
+        return isOperational && reservationAvailability.available !== false ? vehicle : null;
+      }));
 
-        const vehiculosDisponibles = [];
-
-        for (const vehiculo of vehiculos) {
-          const reservasSolapadas = await prisma.reserva.findFirst({
-            where: {
-              vehiculoId: vehiculo.id,
-              estado: { not: 'CANCELADA' },
-              AND: [
-                { fechaInicio: { lt: fin } },
-                { fechaFin: { gt: inicio } }
-              ]
-            },
-          });
-
-          if (!reservasSolapadas) {
-            vehiculosDisponibles.push(vehiculo);
-          }
-        }
-
-        return vehiculosDisponibles;
-      } catch (error) {
-        throw new Error('Error al consultar disponibilidad: ' + error.message);
-      }
-    },
-    reservasPorCliente: (_, { dni }) => prisma.reserva.findMany({
-      where: { cliente: { documento: dni } },
-      include: { cliente: true, vehiculo: true },
-      orderBy: { fechaInicio: 'desc' },
+      return checks.filter(Boolean);
     }),
-    historialReservas: (_, { estado, patente }) => prisma.reserva.findMany({
-      where: {
-        ...(estado && { estado }),
-        ...(patente && { vehiculo: { patente } }),
-      },
-      include: { cliente: true, vehiculo: true },
-      orderBy: { fechaInicio: 'desc' },
+    reservasPorCliente: (_, { dni }) => resolverGraphql(async () => {
+      const customer = await customerClient.getByDocument(dni);
+      const reservations = await rentalClient.list({ clienteId: customer.id });
+      return Promise.all(reservations.map(hydrateReservation));
+    }),
+    historialReservas: (_, { estado, patente }) => resolverGraphql(async () => {
+      const reservations = await rentalClient.history({ estado });
+      const hydrated = await Promise.all(reservations.map(hydrateReservation));
+      return patente
+        ? hydrated.filter((reservation) => reservation.vehiculo?.patente === patente)
+        : hydrated;
     }),
   },
   Mutation: {
-    cancelarReserva: async (_, { id }) => {
-      const reserva = await prisma.reserva.findUnique({ where: { id: Number(id) } });
-      if (!reserva) throw new Error('Reserva no encontrada');
-      if (reserva.estado === 'CANCELADA') throw new Error('La reserva ya está cancelada');
-      if (new Date() >= new Date(reserva.fechaInicio)) {
-        throw new Error('No se puede cancelar una reserva que ya comenzó');
-      }
-
-      return prisma.reserva.update({
-        where: { id: Number(id) },
-        data: { estado: 'CANCELADA' },
-        include: { cliente: true, vehiculo: true },
-      });
-    },
+    cancelarReserva: (_, { id }) => resolverGraphql(async () => {
+      const reservation = await rentalClient.cancel(id);
+      return hydrateReservation(reservation);
+    }),
   },
   Cliente: {
-    dni: (cliente) => cliente.documento,
+    dni: (cliente) => cliente.dni || cliente.documento,
   },
   Reserva: {
-    montoTotal: (reserva) => reserva.importeTotal,
+    montoTotal: (reserva) => reserva.montoTotal ?? reserva.importeTotal,
   },
 };

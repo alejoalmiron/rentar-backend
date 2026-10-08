@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import swaggerUi from 'swagger-ui-express';
-import { PrismaClient } from '@prisma/client';
 import { swaggerSpec } from './config/swagger.js';
+import { closeGrpcClients } from './grpc/clientFactory.js';
 import vehiculoRoutes from './routes/vehiculo.routes.js';
 import clienteRoutes from './routes/cliente.routes.js';
 
@@ -19,8 +19,7 @@ import { resolvers } from './graphql/resolvers.js';
 dotenv.config();
 
 const app = express();
-export const prisma = new PrismaClient();
-
+let httpServer;
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
@@ -47,11 +46,23 @@ async function startServer() {
   app.use('/graphql', express.json(), expressMiddleware(server));
 
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
+  httpServer = app.listen(PORT, () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
     console.log(`📄 Documentación Swagger lista en http://localhost:${PORT}/api-docs`);
     console.log(`🎯 GraphQL Sandbox listo en http://localhost:${PORT}/graphql`);
   });
 }
 
-startServer();
+startServer().catch((error) => {
+  console.error('No se pudo iniciar el API Gateway:', error);
+  process.exitCode = 1;
+});
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.once(signal, () => {
+    httpServer?.close(() => {
+      closeGrpcClients();
+      process.exit(0);
+    });
+  });
+}
